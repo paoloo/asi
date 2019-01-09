@@ -90,6 +90,9 @@ The whole process is fast executed by terraform but take sometime to perform the
 
 A note is that only 3 steps were used on this pipeline butother steps may be created using the same pattern to **add a CI** or any code verification tool.
 
+The current self-generated pipeline may be seen below:
+
+![the codepipeline created](pipeline.png "the whole pipeline")
 
 ## TODO
 - create a configurable SSL step on ALB. To move into SSL is a simple question of adding:
