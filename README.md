@@ -94,6 +94,17 @@ The current self-generated pipeline may be seen below:
 
 ![the codepipeline created](pipeline.png "the whole pipeline")
 
+![some cluster task definitions](clusterdefs.png "cluster task definitions")
+
+## METRICS
+Ater running the pipeline sometimes, I've got the following time:
+
+- **Commit reaction reaction time:** `03 min` +-
+- **Build total time:** `01:30` min+-
+- **Deployment total time:** `05:30` min+-
+
+In general, from a commit to master branch on any repository to a deployed and usable self-scalable cluster with roll-back capabilities, takes about 10 minutes without any human intervention.
+
 ## TODO
 - create a configurable SSL step on ALB. To move into SSL is a simple question of adding:
 ```
