@@ -9,8 +9,8 @@ The idea behind this repository is to describe how to create a basic reusable in
 
 - Create a github OAuth token and a AWS token, add whatever need to be fixed on [variables.tf](variables.tf);
 - `terraform init`
-- `terraform plan`
-- `terraform apply`
+- `terraform plan -var="github_token=YOUR-TOKEN"`
+- `terraform apply -var="github_token=YOUR-TOKEN"`
 
 Just wait and see the magic happens.
 
@@ -39,7 +39,8 @@ According to [Amazon](https://docs.aws.amazon.com/AmazonECS/latest/developerguid
   - CodeBuild
   - CodeDeploy
   - CodePipeline
-
+- Acess Control
+  - Endpoint whitelist
 
 ## Fargate ECS Cluster
 
@@ -96,6 +97,12 @@ The current self-generated pipeline may be seen below:
 
 ![some cluster task definitions](clusterdefs.png "cluster task definitions")
 
+## Acess Control
+
+### Endpoint whitelist
+
+By using [AWS WAF](modules/waf/main.tf) is possible to isolate some endpoints for specific address defined on the [variables](variables.tf#L25-L33) file. It's, also, possible to add extra rule-based ACL on this systems.
+
 ## METRICS
 Ater running the pipeline sometimes, I've got the following time:
 
@@ -105,25 +112,3 @@ Ater running the pipeline sometimes, I've got the following time:
 
 In general, from a commit to master branch on any repository to a deployed and usable self-scalable cluster with roll-back capabilities, takes about 10 minutes without any human intervention.
 
-## TODO
-- create a configurable SSL step on ALB. To move into SSL is a simple question of adding:
-```
-data "aws_acm_certificate" "app-ssl" {
-  domain   = "*.domain.io"
-  statuses = ["ISSUED"]
-}
-
-
-resource "aws_alb_listener" "app-alb-listener" {
-  load_balancer_arn = "${aws_alb.app-alb.arn}"
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "${data.aws_acm_certificate.app-ssl.arn}"
-  default_action {
-    target_group_arn = "${aws_alb_target_group.app-tg.arn}"
-    type             = "forward"
-  }
-}
-```
-the idea is make this modular so that a simple decision would make it work.
