@@ -55,6 +55,14 @@ variable "vpc_cidr" {
   description = "base CIDR for VPC"
   default = "10.77.0.0/16"
 }
+variable "deploy_min_t"   {
+  description = "Minimum healthy tasks during the deployment"
+  default = 0
+}
+variable "deploy_max_t"   {
+  description = "Maximum healthy tasks during the deployment"
+  default = 100
+}
 variable "scale_min" {
   description = "Minimun nodes to scale down"
   default = 1

@@ -180,11 +180,13 @@ DEFINITION
 }
 
 resource "aws_ecs_service" "main" {
-  name            = "${var.app_name}-${var.environment}-ecs-service"
-  cluster         = "${aws_ecs_cluster.main.id}"
-  task_definition = "${aws_ecs_task_definition.app.arn}"
-  desired_count   = "${var.app_count}"
-  launch_type     = "FARGATE"
+  name                               = "${var.app_name}-${var.environment}-ecs-service"
+  cluster                            = "${aws_ecs_cluster.main.id}"
+  task_definition                    = "${aws_ecs_task_definition.app.arn}"
+  desired_count                      = "${var.app_count}"
+  deployment_minimum_healthy_percent = "${var.deploy_min_t}"
+  deployment_maximum_percent         = "${var.deploy_max_t}"
+  launch_type                        = "FARGATE"
   network_configuration {
     security_groups = ["${aws_security_group.ecs_tasks.id}"]
     subnets         = ["${aws_subnet.private.*.id}"]

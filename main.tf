@@ -26,6 +26,8 @@ module "fargate" {
   use_ssl                 = "${var.use_ssl}"
   app_count               = "${var.app_count}"
   az_count                = "${var.az_count}"
+  deploy_min_t            = "${var.deploy_min_t}"
+  deploy_max_t            = "${var.deploy_max_t}"
 }
 
 module "buildndeploy" {
