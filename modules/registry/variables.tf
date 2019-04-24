@@ -4,5 +4,4 @@ variable "app_name" {
 
 variable "environment" {
   description = "Name of an environment (e.g. staging, qa, production)"
-  default = "staging"
 }
