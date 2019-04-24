@@ -12,12 +12,20 @@ module "registry" {
 
 module "fargate" {
   source                  = "./modules/fargate"
+  environment             = "${var.environment}"
   app_name                = "${var.app_name}"
   app_port                = "${var.app_port}"
   vpc_cidr                = "${var.vpc_cidr}"
   app_image               = "${module.registry.repository_uri}:latest"
   scale_min               = "${var.scale_min}"
   scale_max               = "${var.scale_max}"
+  region                  = "${var.region}"
+  base_domain             = "${var.base_domain}"
+  fargate_cpu             = "${var.fargate_cpu}"
+  fargate_memory          = "${var.fargate_memory}"
+  use_ssl                 = "${var.use_ssl}"
+  app_count               = "${var.app_count}"
+  az_count                = "${var.az_count}"
 }
 
 module "buildndeploy" {
@@ -40,6 +48,15 @@ module "hostname" {
   app_name                = "${var.app_name}"
   alb_url                 = "${module.fargate.alb_hostname}"
   base_domain             = "${var.base_domain}"
+}
+
+module "protection" {
+  source                  = "./modules/waf"
+  app_name                = "${var.app_name}"
+  environment             = "${var.environment}"
+  alb_arn                 = "${module.fargate.alb_arn}"
+  protected_endpoint      = "${var.protected_endpoint}"
+  admin_remote_ipset      = "${var.admin_remote_ipset}"
 }
 
 output "app_hn" {

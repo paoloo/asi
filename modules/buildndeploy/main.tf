@@ -5,7 +5,7 @@
 /* ================================================================ Artifact */
 
 resource "aws_s3_bucket" "main" {
-  bucket = "${var.ecs_cluster_name}-bucket"
+  bucket = "${var.ecs_cluster_name}-${var.environment}-bucket"
   acl    = "private"
   tags {
     Name        = "${var.ecs_cluster_name}-bucket"
@@ -32,7 +32,7 @@ data "template_file" "buildspec" {
 }
 
 resource "aws_codebuild_project" "docker_build" {
-  name          = "docker-codebuild"
+  name          = "${var.repository_name}-${var.environment}-build"
   build_timeout = "10"
   service_role  = "${aws_iam_role.buildndeploy-role.arn}"
   artifacts {
@@ -40,7 +40,7 @@ resource "aws_codebuild_project" "docker_build" {
   }
   environment {
     compute_type    = "BUILD_GENERAL1_SMALL"
-    image           = "aws/codebuild/docker:1.12.1"
+    image           = "aws/codebuild/docker:17.09.0"
     type            = "LINUX_CONTAINER"
     privileged_mode = true
   }
@@ -57,7 +57,7 @@ resource "aws_codebuild_project" "docker_build" {
 /* ============================================================ CodePipeline */
 
 resource "aws_codepipeline" "pipeline" {
-  name     = "app-pipeline"
+  name     = "${var.repository_name}-${var.environment}-pipeline"
   role_arn = "${aws_iam_role.buildndeploy-role.arn}"
   artifact_store {
     location = "${aws_s3_bucket.main.bucket}"
@@ -92,7 +92,7 @@ resource "aws_codepipeline" "pipeline" {
       input_artifacts  = ["source"]
       output_artifacts = ["imagedefinitions"]
       configuration {
-        ProjectName = "docker-codebuild"
+        ProjectName = "${var.repository_name}-${var.environment}-build"
       }
     }
   }
@@ -122,7 +122,7 @@ resource "aws_codepipeline" "pipeline" {
 /* =============================================================== IAM Roles */
 
 resource "aws_iam_role" "buildndeploy-role" {
-  name = "buildndeploy-role"
+  name = "${var.repository_name}-${var.environment}-buildndeploy-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -145,7 +145,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "buildndeploy-policy" {
-  name = "buildndeploy-policy"
+  name = "${var.repository_name}-${var.environment}-buildndeploy-policy"
   role = "${aws_iam_role.buildndeploy-role.id}"
   policy = <<EOF
 {

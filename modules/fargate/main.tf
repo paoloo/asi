@@ -89,6 +89,16 @@ resource "aws_route_table_association" "private" {
   route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
 }
 
+/* ========================================================================= */
+/* ================= LOGS ================================================== */
+/* ========================================================================= */
+
+resource "aws_cloudwatch_log_group" "main" {
+  name = "${var.app_name}-${var.environment}-log-grp-app"
+  tags {
+    Environment = "${var.environment}"
+  }
+}
 
 /* ========================================================================= */
 /* ================= ALB =================================================== */
@@ -98,17 +108,17 @@ resource "random_id" "tgs" {
 }
 
 resource "aws_alb" "main" {
-  name            =  "${var.environment}-alb-app"
+  name            = "${var.app_name}-${var.environment}-alb"
   subnets         = ["${aws_subnet.public.*.id}"]
   security_groups = ["${aws_security_group.lb.id}"]
   tags {
-    Name        = "${var.environment}-alb-app"
+    Name        = "${var.app_name}-${var.environment}-alb"
     Environment = "${var.environment}"
   }
 }
 
 resource "aws_alb_target_group" "app" {
-  name        = "${var.environment}-alb-tg-${random_id.tgs.hex}"
+  name        = "${var.app_name}-${var.environment}-alb-${random_id.tgs.hex}"
   port        = "${var.app_port}"
   protocol    = "HTTP"
   vpc_id      = "${aws_vpc.main.id}"
@@ -118,16 +128,13 @@ resource "aws_alb_target_group" "app" {
   }
 }
 
-resource "aws_alb_listener" "application" {
-  load_balancer_arn = "${aws_alb.main.id}"
-  port              = "80"
-  protocol          = "HTTP"
-  default_action {
-    target_group_arn = "${aws_alb_target_group.app.id}"
-    type             = "forward"
-  }
+module "alb_listener" {
+  /* === source      = "${var.environment_name == true ? ./ssl : ./plain}" === terraform v0.12.? */
+  source      = "./plain"
+  alb_arn     = "${aws_alb.main.arn}"
+  alb_tg_arn  = "${aws_alb_target_group.app.arn}"
+  base_domain = "${var.base_domain}"
 }
-
 
 /* ========================================================================= */
 /* ================= ECS =================================================== */
@@ -157,7 +164,16 @@ resource "aws_ecs_task_definition" "app" {
         "containerPort": ${var.app_port},
         "hostPort": ${var.app_port}
       }
-    ]
+    ],
+    "logConfiguration": {
+	    "logDriver": "awslogs",
+	    "options": {
+	        "awslogs-group": "${aws_cloudwatch_log_group.main.name}",
+	        "awslogs-region": "${var.region}",
+	        "awslogs-stream-prefix": "${var.app_name}-${var.environment}"
+	    }
+	}
+
   }
 ]
 DEFINITION
@@ -179,7 +195,7 @@ resource "aws_ecs_service" "main" {
     container_port   = "${var.app_port}"
   }
   depends_on = [
-    "aws_alb_listener.application",
+    "module.alb_listener",
   ]
 }
 
@@ -257,7 +273,7 @@ resource "aws_cloudwatch_metric_alarm" "service_cpu_high" {
 
 /* ====================================================== ALB Security group */
 resource "aws_security_group" "lb" {
-  name        = "tf-ecs-alb"
+  name        = "${var.app_name}-${var.environment}-ecs-alb"
   description = "controls access to the ALB"
   vpc_id      = "${aws_vpc.main.id}"
   ingress {
@@ -279,7 +295,7 @@ resource "aws_security_group" "lb" {
 
 /* ============================================ ALB->ECS Cluster-only access */
 resource "aws_security_group" "ecs_tasks" {
-  name        = "tf-ecs-tasks"
+  name        = "${var.app_name}-${var.environment}-ecs-tasks"
   description = "allow inbound access from the ALB only"
   vpc_id      = "${aws_vpc.main.id}"
   ingress {
@@ -299,7 +315,7 @@ resource "aws_security_group" "ecs_tasks" {
 /* ================================================== ECS policies and roles */
 
 resource "aws_iam_role" "ecs-role" {
-  name = "ecs-role"
+  name = "${var.app_name}-${var.environment}-ecs-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -323,7 +339,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "ecs-policy" {
-  name = "ecs-policy"
+  name = "${var.app_name}-${var.environment}-ecs-policy"
   role = "${aws_iam_role.ecs-role.id}"
   policy = <<EOF
 {

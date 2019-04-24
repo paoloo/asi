@@ -2,6 +2,10 @@ output "alb_hostname" {
   value = "${aws_alb.main.dns_name}"
 }
 
+output "alb_arn" {
+  value = "${aws_alb.main.arn}"
+}
+
 output "sni_prv" {
   value = "${aws_subnet.private.*.id}"
 }
