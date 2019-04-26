@@ -57,11 +57,11 @@ variable "vpc_cidr" {
 }
 variable "deploy_min_t"   {
   description = "Minimum healthy tasks during the deployment"
-  default = 0
+  default = 100
 }
 variable "deploy_max_t"   {
   description = "Maximum healthy tasks during the deployment"
-  default = 100
+  default = 200
 }
 variable "scale_min" {
   description = "Minimun nodes to scale down"
