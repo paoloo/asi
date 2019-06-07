@@ -126,6 +126,14 @@ resource "aws_alb_target_group" "app" {
   lifecycle {
     create_before_destroy = true
   }
+  health_check {
+    healthy_threshold   = 5
+    unhealthy_threshold = 5
+    timeout             = 10
+    interval            = 30
+    path                = "${var.health_check_path}"
+  }
+
 }
 
 module "alb_listener" {
