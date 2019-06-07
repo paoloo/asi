@@ -28,6 +28,7 @@ module "fargate" {
   az_count                = "${var.az_count}"
   deploy_min_t            = "${var.deploy_min_t}"
   deploy_max_t            = "${var.deploy_max_t}"
+  health_check_path       = "${var.health_check_path}"
 }
 
 module "buildndeploy" {
