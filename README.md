@@ -54,9 +54,11 @@ Now, just wait and see the magic happens.
 
 ### Networking
 
-In order to achieve high availability, spawn the resources on more than one zone is the first thing to do as some regions have specific failures(natural disasters and thing like that) and, on these cases, the application will keep running on the others. So, initially, we create a VPC with, at least, 2 subnets (1 public and 1 private) in each *Availability Zone*.
+In order to achieve high availability, spawn the resources on more than one availability zone is the first thing to do to avoid some regions-specific failures so that the application will keep always running. Therefore, we create a VPC with, at least, 2 subnets (1 public and 1 private) in each *Availability Zone*.
 
 Also, regarding the two subnets, is more than just best practices. In order to protect the infrastructure from unnecessary and unfiltered access, it's important to keep the cluster inside a _private subnet_ which allows traffic only from resources inside the _public subnet_, like the Application Load Balancer and a debug box, if we need it somehow.
+
+An _ECS task_ on Fargate is integrated into a VPC, gets it’s own _Elastic Network Interface_(ENI), behaving like an EC2 instance, running in a single subnet, with a private ( and an optional public ) IP address and protected by a security group.
 
 The creation of the VPC may be seen [here](modules/fargate/main.tf#L9-L17) and the creation of subnets [here](modules/fargate/main.tf#L19-L41)
 
