@@ -1,6 +1,6 @@
 variable "region" {
   description = "AWS region to build this infrastructure"
-  default = "us-east-1"
+  default = "us-west-2"
 }
 variable "github_token" {
   description = "GitHub OAuth key"
@@ -8,7 +8,7 @@ variable "github_token" {
 }
 variable "app_name" {
   description = "application base unique name"
-  default = "testium"
+  default = "testex"
 }
 variable "app_port" {
   description = "application port"
@@ -17,19 +17,6 @@ variable "app_port" {
 variable "use_ssl" {
   description = "use SSL? yes or no"
   default = "no"
-}
-variable "protected_endpoint" {
-  description = "application protected endpoint"
-  default = "/version"
-}
-variable "admin_remote_ipset" {
-  description = "list of ips authorized to access the protected endpoint"
-  default = [
-    {
-      value = "67.170.164.232/32"
-      type  = "IPV4"
-    },
-  ]
 }
 variable "environment" {
   description = "Name of an environment (e.g. staging, qa, production)"
@@ -49,7 +36,7 @@ variable "repository_branch" {
 }
 variable "base_domain" {
   description = "top level domain where application should respond"
-  default ="rally-dev.io"
+  default ="fplat.io"
 }
 variable "vpc_cidr" {
   description = "base CIDR for VPC"
