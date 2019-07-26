@@ -76,6 +76,13 @@ resource "aws_ecs_task_definition" "app" {
     "memory": ${var.fargate_memory},
     "name": "app",
     "networkMode": "awsvpc",
+    "ulimits": [
+      {
+        "name": "nofile",
+        "softLimit": 1000000,
+        "hardLimit": 1000000
+      }
+    ],
     "portMappings": [
       {
         "containerPort": ${var.app_port},
