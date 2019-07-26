@@ -1,95 +1,4 @@
 /* ========================================================================= */
-/* ================= NETWORKING ============================================ */
-/* ========================================================================= */
-
-/* ========================================= Fetch AZs in the current region */
-data "aws_availability_zones" "available" {}
-
-/* ===================================================================== VPC */
-resource "aws_vpc" "main" {
-  cidr_block = "${var.vpc_cidr}"
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-  tags {
-    Name        = "${var.environment}-vpc"
-    Environment = "${var.environment}"
-  }
-}
-
-/* ========================================================== Private subnet */
-resource "aws_subnet" "private" {
-  count                   = "${var.az_count}"
-  cidr_block              = "${cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)}"
-  availability_zone       = "${data.aws_availability_zones.available.names[count.index]}"
-  vpc_id                  = "${aws_vpc.main.id}"
-  map_public_ip_on_launch = false
-  tags {
-    Environment = "${var.environment}"
-  }
-}
-
-/* =========================================================== Public subnet */
-resource "aws_subnet" "public" {
-  count                   = "${var.az_count}"
-  cidr_block              = "${cidrsubnet(aws_vpc.main.cidr_block, 8, var.az_count + count.index)}"
-  availability_zone       = "${data.aws_availability_zones.available.names[count.index]}"
-  vpc_id                  = "${aws_vpc.main.id}"
-  map_public_ip_on_launch = true
-  tags {
-    Environment = "${var.environment}"
-  }
-}
-
-/* ======================================================== Internet gateway */
-resource "aws_internet_gateway" "gw" {
-  vpc_id = "${aws_vpc.main.id}"
-  tags {
-    Name        = "${var.environment}-igw"
-    Environment = "${var.environment}"
-  }
-}
-
-/* ====================================================== Elastic IP for NAT */
-resource "aws_eip" "gw" {
-  count      = "${var.az_count}"
-  vpc        = true
-  depends_on = ["aws_internet_gateway.gw"]
-}
-
-/* ===================================================================== NAT */
-resource "aws_nat_gateway" "gw" {
-  count         = "${var.az_count}"
-  subnet_id     = "${element(aws_subnet.public.*.id, count.index)}"
-  allocation_id = "${element(aws_eip.gw.*.id, count.index)}"
-  tags {
-    Environment = "${var.environment}"
-  }
-}
-
-/* ========================================= Routing table for public subnet */
-resource "aws_route" "internet_access" {
-  route_table_id         = "${aws_vpc.main.main_route_table_id}"
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = "${aws_internet_gateway.gw.id}"
-}
-
-/* ======================================== Routing table for private subnet */
-resource "aws_route_table" "private" {
-  count  = "${var.az_count}"
-  vpc_id = "${aws_vpc.main.id}"
-  route {
-    cidr_block = "0.0.0.0/0"
-    nat_gateway_id = "${element(aws_nat_gateway.gw.*.id, count.index)}"
-  }
-}
-/* ================================================ Route table association */
-resource "aws_route_table_association" "private" {
-  count          = "${var.az_count}"
-  subnet_id      = "${element(aws_subnet.private.*.id, count.index)}"
-  route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
-}
-
-/* ========================================================================= */
 /* ================= LOGS ================================================== */
 /* ========================================================================= */
 
@@ -109,7 +18,7 @@ resource "random_id" "tgs" {
 
 resource "aws_alb" "main" {
   name            = "${var.app_name}-${var.environment}-alb"
-  subnets         = ["${aws_subnet.public.*.id}"]
+  subnets         = ["${var.public_subnet}"]
   security_groups = ["${aws_security_group.lb.id}"]
   tags {
     Name        = "${var.app_name}-${var.environment}-alb"
@@ -121,7 +30,7 @@ resource "aws_alb_target_group" "app" {
   name        = "${var.app_name}-${var.environment}-alb-${random_id.tgs.hex}"
   port        = "${var.app_port}"
   protocol    = "HTTP"
-  vpc_id      = "${aws_vpc.main.id}"
+  vpc_id      = "${var.vpc_id}"
   target_type = "ip"
   lifecycle {
     create_before_destroy = true
@@ -197,7 +106,7 @@ resource "aws_ecs_service" "main" {
   launch_type                        = "FARGATE"
   network_configuration {
     security_groups = ["${aws_security_group.ecs_tasks.id}"]
-    subnets         = ["${aws_subnet.private.*.id}"]
+    subnets         = ["${var.private_subnet}"]
   }
   load_balancer {
     target_group_arn = "${aws_alb_target_group.app.id}"
@@ -285,7 +194,7 @@ resource "aws_cloudwatch_metric_alarm" "service_cpu_high" {
 resource "aws_security_group" "lb" {
   name        = "${var.app_name}-${var.environment}-ecs-alb"
   description = "controls access to the ALB"
-  vpc_id      = "${aws_vpc.main.id}"
+  vpc_id      = "${var.vpc_id}"
   ingress {
     protocol    = "tcp"
     from_port   = 80
@@ -307,7 +216,7 @@ resource "aws_security_group" "lb" {
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.app_name}-${var.environment}-ecs-tasks"
   description = "allow inbound access from the ALB only"
-  vpc_id      = "${aws_vpc.main.id}"
+  vpc_id      = "${var.vpc_id}"
   ingress {
     protocol        = "tcp"
     from_port       = "${var.app_port}"
