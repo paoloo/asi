@@ -6,11 +6,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+    - name: code checkout
+      uses: actions/checkout@v1
+
     - name: tf fmt
       uses: "hashicorp/terraform-github-actions/fmt@v0.3.6"
-      
+
     - name: tf init
       uses: "hashicorp/terraform-github-actions/init@v0.3.6"
-      
+
     - name: tf verify
       uses: "hashicorp/terraform-github-actions/validate@v0.3.6"
