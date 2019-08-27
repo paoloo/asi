@@ -27,6 +27,10 @@ and, finally,
 
 Now, just wait and see the magic happens.
 
+## IMPORTANT!!!
+
+The master branch is suitable for terraform `0.12.*`. to uso terraform `0.11.*`, checkout the corresponding tag or branch.
+
 ## High level infrastructure design
 
 ![Full flow described](flow.png "full flow")
