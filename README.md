@@ -1,7 +1,7 @@
 # ASI
 Alius Simplex Infrastructure (another simple infrastructure)
 
-![CI status](workflows/CI/badge.svg "CI")
+![CI status](https://github.com/paoloo/asi/workflows/CI/badge.svg)
 
 The idea behind this repository is to describe how to create a basic reusable infrastructure to automatic deploy any containerized application whose source code is publicly available. The image will be built using **AWS Codebuild**, triggered on every commit to the master branch of the application's **GitHub** repository by **AWS Codedeploy**, then registered on **AWS ECR** and, finally, run as an **AWS ECS** cluster on **AWS Fargate**.
 
