@@ -9,3 +9,4 @@ variable "base_domain" {
 variable "alb_url" {
   description = "URL to register the ALB"
 }
+

@@ -1,7 +1,11 @@
+variable "base_domain" {
+}
 
-variable "base_domain" {}
-variable "alb_arn" {}
-variable "alb_tg_arn" {}
+variable "alb_arn" {
+}
+
+variable "alb_tg_arn" {
+}
 
 data "aws_acm_certificate" "app-ssl" {
   domain   = "*.${var.base-domain}"
@@ -9,13 +13,13 @@ data "aws_acm_certificate" "app-ssl" {
 }
 
 resource "aws_alb_listener" "application" {
-  load_balancer_arn = "${var.alb_arn}"
+  load_balancer_arn = var.alb_arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "${data.aws_acm_certificate.app-ssl.arn}"
+  certificate_arn   = data.aws_acm_certificate.app-ssl.arn
   default_action {
-    target_group_arn = "${var.alb_tg_arn}"
+    target_group_arn = var.alb_tg_arn
     type             = "forward"
   }
 }

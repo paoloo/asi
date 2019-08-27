@@ -5,14 +5,13 @@
 /* ================================================================ Artifact */
 
 resource "aws_s3_bucket" "main" {
-  bucket = "${var.ecs_cluster_name}-${var.environment}-bucket"
+  bucket = "${var.ecs_cluster_name}-${var.environment}"
   acl    = "private"
-  tags {
-    Name        = "${var.ecs_cluster_name}-bucket"
-    Environment = "${var.environment}"
+  tags = {
+    Name        = "${var.ecs_cluster_name}-${var.environment}"
+    Environment = var.environment
   }
 }
-
 
 /* ========================================================================= */
 /* ================= BUILD ================================================= */
@@ -20,21 +19,10 @@ resource "aws_s3_bucket" "main" {
 
 /* =============================================================== CodeBuild */
 
-data "template_file" "buildspec" {
-  template = "${file("${path.module}/appspec.yml")}"
-  vars {
-    repository_uri     = "${var.registry_uri}"
-    region             = "${var.region}"
-    cluster_name       = "${var.ecs_cluster_name}"
-    subnet_id          = "${join (",", var.task_subnet_id)}"
-    security_group_ids = "${join(",", var.task_secgrp_id)}"
-  }
-}
-
 resource "aws_codebuild_project" "docker_build" {
   name          = "${var.repository_name}-${var.environment}-build"
   build_timeout = "10"
-  service_role  = "${aws_iam_role.buildndeploy-role.arn}"
+  service_role  = aws_iam_role.buildndeploy-role.arn
   artifacts {
     type = "CODEPIPELINE"
   }
@@ -46,7 +34,12 @@ resource "aws_codebuild_project" "docker_build" {
   }
   source {
     type      = "CODEPIPELINE"
-    buildspec = "${data.template_file.buildspec.rendered}"
+    buildspec = templatefile("${path.module}/appspec.yml",{ app_environment     = var.environment,
+                                                            repository_uri      = var.registry_uri,
+                                                            region              = var.region,
+                                                            cluster_name        = var.ecs_cluster_name,
+                                                            subnet_id           = join(",", var.task_subnet_id),
+                                                            security_group_ids  = join(",", var.task_secgrp_id) })
   }
 }
 
@@ -58,9 +51,9 @@ resource "aws_codebuild_project" "docker_build" {
 
 resource "aws_codepipeline" "pipeline" {
   name     = "${var.repository_name}-${var.environment}-pipeline"
-  role_arn = "${aws_iam_role.buildndeploy-role.arn}"
+  role_arn = aws_iam_role.buildndeploy-role.arn
   artifact_store {
-    location = "${aws_s3_bucket.main.bucket}"
+    location = aws_s3_bucket.main.bucket
     type     = "S3"
   }
   stage {
@@ -72,11 +65,11 @@ resource "aws_codepipeline" "pipeline" {
       provider         = "GitHub"
       version          = "1"
       output_artifacts = ["source"]
-      configuration {
-        Owner      = "${var.repository_owner}"
-        Repo       = "${var.repository_name}"
-        Branch     = "${var.repository_branch}"
-        OAuthToken = "${var.github_token}"
+      configuration = {
+        Owner      = var.repository_owner
+        Repo       = var.repository_name
+        Branch     = var.repository_branch
+        OAuthToken = var.github_token
       }
     }
   }
@@ -91,7 +84,7 @@ resource "aws_codepipeline" "pipeline" {
       version          = "1"
       input_artifacts  = ["source"]
       output_artifacts = ["imagedefinitions"]
-      configuration {
+      configuration = {
         ProjectName = "${var.repository_name}-${var.environment}-build"
       }
     }
@@ -106,9 +99,9 @@ resource "aws_codepipeline" "pipeline" {
       provider        = "ECS"
       input_artifacts = ["imagedefinitions"]
       version         = "1"
-      configuration {
-        ClusterName = "${var.ecs_cluster_name}"
-        ServiceName = "${var.ecs_service_name}"
+      configuration = {
+        ClusterName = var.ecs_cluster_name
+        ServiceName = var.ecs_service_name
         FileName    = "imagedefinitions.json"
       }
     }
@@ -122,7 +115,7 @@ resource "aws_codepipeline" "pipeline" {
 /* =============================================================== IAM Roles */
 
 resource "aws_iam_role" "buildndeploy-role" {
-  name = "${var.repository_name}-${var.environment}-buildndeploy-role"
+  name               = "${var.repository_name}-${var.environment}-buildndeploy-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -142,11 +135,12 @@ resource "aws_iam_role" "buildndeploy-role" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy" "buildndeploy-policy" {
-  name = "${var.repository_name}-${var.environment}-buildndeploy-policy"
-  role = "${aws_iam_role.buildndeploy-role.id}"
+  name   = "${var.repository_name}-${var.environment}-buildndeploy-policy"
+  role   = aws_iam_role.buildndeploy-role.id
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -184,5 +178,6 @@ resource "aws_iam_role_policy" "buildndeploy-policy" {
   ]
 }
 EOF
+
 }
 
