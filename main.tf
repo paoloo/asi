@@ -1,6 +1,6 @@
 provider "aws" {
   shared_credentials_file = "$HOME/.aws/credentials"
-  profile                 = "shoutout"
+  profile                 = "default"
   region                  = var.region
 }
 
