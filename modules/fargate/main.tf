@@ -45,7 +45,7 @@ resource "aws_alb_target_group" "app" {
 }
 
 module "alb_listener" {
-  /* === source      = "${var.environment_name == true ? ./ssl : ./plain}" === terraform v0.12.? */
+  /* === source      = "${var.use_ssl == "yes" ? ./ssl : ./plain}" === terraform v0.12.? */
   source      = "./plain"
   alb_arn     = aws_alb.main.arn
   alb_tg_arn  = aws_alb_target_group.app.arn
@@ -200,8 +200,8 @@ resource "aws_security_group" "lb" {
   vpc_id      = var.vpc_id
   ingress {
     protocol    = "tcp"
-    from_port   = 80
-    to_port     = 80
+    from_port   = "${var.use_ssl == "yes" ? 443 : 80}"
+    to_port     = "${var.use_ssl == "yes" ? 443 : 80}"
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
