@@ -62,6 +62,10 @@ variable "vpc_id" {
   description = "vpc id"
 }
 
+variable "vpc_cidr" {
+  description = "The CIDR block of the vpc"
+}
+
 variable "public_subnet" {
   description = "array of public subnets"
   type        = list(string)
@@ -72,3 +76,14 @@ variable "private_subnet" {
   type        = list(string)
 }
 
+variable "db_name" {
+  description = "database name"
+}
+
+variable "db_username" {
+  description = "database username"
+}
+
+variable "db_passwd" {
+  description = "database password"
+}

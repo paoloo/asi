@@ -36,8 +36,12 @@ module "fargate" {
   deploy_max_t      = var.deploy_max_t
   health_check_path = var.health_check_path
   vpc_id            = module.network.vpc_id
+  vpc_cidr          = var.vpc_cidr
   public_subnet     = module.network.subnet_pub
   private_subnet    = module.network.subnet_prv
+  db_name           = var.db_name
+  db_username       = var.db_username
+  db_passwd         = var.db_passwd
 }
 
 module "buildndeploy" {

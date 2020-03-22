@@ -45,7 +45,7 @@ variable "repository_branch" {
 
 variable "base_domain" {
   description = "top level domain where application should respond"
-  default     = "shoutout-dev.io"
+  default     = "covidzero.io"
 }
 
 variable "vpc_cidr" {
@@ -98,3 +98,17 @@ variable "health_check_path" {
   default     = "/"
 }
 
+variable "db_name" {
+  description = "database name"
+  default     = "covid"
+}
+
+variable "db_username" {
+  description = "database username"
+  default     = "covid-admin"
+}
+
+variable "db_passwd" {
+  description = "database password"
+  default     = "covid-passwd"
+}
