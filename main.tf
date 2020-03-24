@@ -1,9 +1,3 @@
-provider "aws" {
-  shared_credentials_file = "$HOME/.aws/credentials"
-  profile                 = "default"
-  region                  = var.region
-}
-
 module "registry" {
   source      = "./modules/registry"
   app_name    = var.app_name
@@ -58,15 +52,3 @@ module "buildndeploy" {
   task_secgrp_id    = module.fargate.task_secgrp_id
   github_token      = var.github_token
 }
-
-module "hostname" {
-  source      = "./modules/ns"
-  app_name    = var.app_name
-  alb_url     = module.fargate.alb_hostname
-  base_domain = var.base_domain
-}
-
-output "app_hn" {
-  value = module.hostname.name
-}
-

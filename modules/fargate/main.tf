@@ -206,8 +206,8 @@ resource "aws_security_group" "lb" {
   vpc_id      = var.vpc_id
   ingress {
     protocol    = "tcp"
-    from_port   = "${var.use_ssl == "yes" ? 443 : 80}"
-    to_port     = "${var.use_ssl == "yes" ? 443 : 80}"
+    from_port   = (var.use_ssl == "yes" ? 443 : 80)
+    to_port     = (var.use_ssl == "yes" ? 443 : 80)
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
