@@ -112,3 +112,7 @@ variable "db_passwd" {
   description = "database password"
   default     = "covid-passwd"
 }
+
+variable "cloudflare_api_token" {
+  description = "cloudflare api token to be used in integations"
+}
