@@ -10,7 +10,7 @@ variable "github_token" {
 
 variable "app_name" {
   description = "application base unique name"
-  default     = "covidzero"
+  default     = "hummingbird"
 }
 
 variable "app_port" {
@@ -111,4 +111,17 @@ variable "db_username" {
 variable "db_passwd" {
   description = "database password"
   default     = "covid-passwd"
+}
+
+variable "jwt_secret_key" {
+  description = "jwt secret key"
+  default     = ""
+}
+
+variable "auth_username" {
+  description = "auth username"
+}
+
+variable "auth_password" {
+  description = "auth_password"
 }

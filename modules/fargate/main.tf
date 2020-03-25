@@ -89,10 +89,13 @@ resource "aws_ecs_task_definition" "app" {
       }
     ],
     "environment": [
-      {"name": "DB_ENDPOINT" , "value": "${aws_rds_cluster.default.endpoint}" },
-      {"name": "DB_NAME"     , "value": "${var.db_name}" },
-      {"name": "DB_USERNAME" , "value": "${var.db_username}" },
-      {"name": "DB_PASSWD"   , "value": "${var.db_passwd}" }
+      {"name": "AUTH_USERNAME", "value": "${var.auth_username}" },
+      {"name": "AUTH_PASSWORD", "value": "${var.auth_password}" },
+      {"name": "DB_ENDPOINT", "value": "${aws_rds_cluster.default.endpoint}" },
+      {"name": "DB_NAME", "value": "${var.db_name}" },
+      {"name": "DB_PASSWD", "value": "${var.db_passwd}" },
+      {"name": "DB_USERNAME", "value": "${var.db_username}" },
+      {"name": "JWT_SECRET_KEY", "value": "${var.jwt_secret_key}" }
     ],
     "logConfiguration": {
 	    "logDriver": "awslogs",
