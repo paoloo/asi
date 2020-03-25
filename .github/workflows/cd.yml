@@ -17,6 +17,9 @@ jobs:
       TF_VAR_db_name: ${{secrets.DB_NAME}}
       TF_VAR_db_username:  ${{secrets.DB_USERNAME}}
       TF_VAR_db_passwd: ${{secrets.DB_PASSWORD}}
+      TF_VAR_github_token: ${{secrets.GITHUB_TOKEN_ORG}
+      TF_VAR_repository_owner: "CovidZero"
+      TF_VAR_repository_name: "hummingbird-v2"
 
     steps:
     - name: "Code Checkout"
