@@ -62,7 +62,7 @@ module "hostname" {
 
 module "hostname_api" {
   source      = "./modules/ns"
-  app_name    = "api"
+  app_name    = var.hostname_default != "" ? var.hostname_default : var.app_name
   alb_url     = module.fargate.alb_hostname
   base_domain = var.base_domain
 }
