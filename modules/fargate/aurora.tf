@@ -13,7 +13,7 @@ resource "aws_rds_cluster" "default" {
   storage_encrypted = "true"
   backup_retention_period = "1"
   db_subnet_group_name = aws_db_subnet_group.main.name
-  engine = "aurora"
+  engine = "aurora-postgresql"
   engine_mode = "serverless"
   vpc_security_group_ids = [
     aws_security_group.rds.id
