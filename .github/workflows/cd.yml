@@ -20,6 +20,7 @@ jobs:
       TF_VAR_github_token: ${{secrets.GITHUB_TOKEN_ORG}}
       TF_VAR_repository_owner: "CovidZero"
       TF_VAR_repository_name: "hummingbird-v2"
+      TF_VAR_cloudflare_api_token: ${{secrets.CLOUDFLARE_API_TOKEN}}
 
     steps:
     - name: "Code Checkout"
