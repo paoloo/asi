@@ -119,5 +119,5 @@ variable "cloudflare_api_token" {
 
 variable "hostname_default" {
   description = "If you'd like to an specific hostname instead of app_name.domain.com"
-  default = ""
+  default     = ""
 }
