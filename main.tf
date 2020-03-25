@@ -68,4 +68,5 @@ module "hostname_api" {
   app_name    = var.hostname_default != "" ? var.hostname_default : var.app_name
   alb_url     = module.fargate.alb_hostname
   base_domain = var.base_domain
+  is_proxied  = true
 }
