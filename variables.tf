@@ -125,3 +125,7 @@ variable "auth_username" {
 variable "auth_password" {
   description = "auth_password"
 }
+
+variable "cloudflare_api_token" {
+  description = "cloudflare api token to be used in integations"
+}
