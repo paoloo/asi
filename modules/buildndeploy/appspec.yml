@@ -12,7 +12,7 @@ phases:
   build:
     commands:
       - echo [+] Build started on `date`
-      - docker build --build-arg COMMIT="$CODEBUILD_RESOLVED_SOURCE_VERSION" RUN_ENVIRONMENT=${app_environment} --tag $REPOSITORY_URI:latest .
+      - docker build --build-arg COMMIT="$CODEBUILD_RESOLVED_SOURCE_VERSION" --build-arg RUN_ENVIRONMENT="${app_environment}" --tag $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
