@@ -1,3 +1,4 @@
-output "hostname_api_name" {
-  value = module.hostname_api.name
+output "hostname" {
+  description = "Application hostname"
+  value = module.hostname.name
 }
