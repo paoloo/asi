@@ -95,7 +95,7 @@ variable "fargate_memory" {
 
 variable "health_check_path" {
   description = "path for healthcheck"
-  default     = "/"
+  default     = "/data_api/v1/"
 }
 
 variable "db_name" {
