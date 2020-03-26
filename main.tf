@@ -55,3 +55,18 @@ module "buildndeploy" {
   task_secgrp_id    = module.fargate.task_secgrp_id
   github_token      = var.github_token
 }
+
+module "hostname" {
+  source      = "./modules/ns"
+  app_name    = var.app_name
+  alb_url     = module.fargate.alb_hostname
+  base_domain = var.base_domain
+}
+
+module "hostname_api" {
+  source      = "./modules/ns"
+  app_name    = var.hostname_default != "" ? var.hostname_default : var.app_name
+  alb_url     = module.fargate.alb_hostname
+  base_domain = var.base_domain
+  is_proxied  = true
+}

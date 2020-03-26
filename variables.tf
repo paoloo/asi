@@ -45,7 +45,7 @@ variable "repository_branch" {
 
 variable "base_domain" {
   description = "top level domain where application should respond"
-  default     = "covidzero.io"
+  default     = "covidzero.com.br"
 }
 
 variable "vpc_cidr" {
@@ -124,4 +124,13 @@ variable "auth_username" {
 
 variable "auth_password" {
   description = "auth_password"
+}
+
+variable "cloudflare_api_token" {
+  description = "cloudflare api token to be used in integations"
+}
+
+variable "hostname_default" {
+  description = "If you'd like to an specific hostname instead of app_name.domain.com"
+  default     = ""
 }
