@@ -56,7 +56,7 @@ module "buildndeploy" {
   github_token      = var.github_token
 }
 
-module "hostname_api" {
+module "hostname" {
   source      = "./modules/ns"
   app_name    = var.hostname_default != "" ? var.hostname_default : var.app_name
   alb_url     = module.fargate.alb_hostname
