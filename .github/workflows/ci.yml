@@ -26,7 +26,6 @@ jobs:
       TF_VAR_jwt_secret_key: ${{secrets.JWT_SECRET_KEY}}
       TF_VAR_repository_name: "hummingbird-v2"
       TF_VAR_repository_owner: "CovidZero"
-      TF_VAR_cloudflare_api_token: ${{secrets.CLOUDFLARE_API_TOKEN}}
 
     steps:
     - name: "Code Checkout"
