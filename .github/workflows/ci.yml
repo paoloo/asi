@@ -17,10 +17,12 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       TF_VAR_auth_password: ${{secrets.AUTH_PASSWORD}}
       TF_VAR_auth_username: ${{secrets.AUTH_USERNAME}}
+      TF_VAR_cloudflare_api_token: ${{secrets.CLOUDFLARE_API_TOKEN}}
       TF_VAR_db_name: ${{secrets.DB_NAME}}
       TF_VAR_db_passwd: ${{secrets.DB_PASSWORD}}
       TF_VAR_db_username:  ${{secrets.DB_USERNAME}}
       TF_VAR_github_token: ${{secrets.GITHUB_TOKEN_ORG}}
+      TF_VAR_hostname_default: ${{secrets.HOSTNAME_DEFAULT}}
       TF_VAR_jwt_secret_key: ${{secrets.JWT_SECRET_KEY}}
       TF_VAR_repository_name: "hummingbird-v2"
       TF_VAR_repository_owner: "CovidZero"

@@ -9,8 +9,9 @@ resource "aws_rds_cluster" "default" {
   database_name = var.db_name
   master_username = var.db_username
   master_password = var.db_passwd
-  skip_final_snapshot = "true"
-  storage_encrypted = "true"
+  skip_final_snapshot = false
+  enable_http_endpoint = true
+  storage_encrypted = true
   backup_retention_period = "1"
   db_subnet_group_name = aws_db_subnet_group.main.name
   engine = "aurora-postgresql"
@@ -23,6 +24,10 @@ resource "aws_rds_cluster" "default" {
     max_capacity = 4
     min_capacity = 2
     seconds_until_auto_pause = 30000
+  }
+
+  tags = {
+    Terraform = true 
   }
 }
 
