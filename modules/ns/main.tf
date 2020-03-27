@@ -18,5 +18,5 @@ resource "cloudflare_record" "app_hostname" {
   name    = "${var.app_name}.${var.base_domain}"
   value   = var.alb_url
   type    = "CNAME"
-  ttl     = "300"
+  ttl     = "1"
 }
